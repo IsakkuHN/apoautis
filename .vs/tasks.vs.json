@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "tarea-consultas.class",
+      "appliesTo": "v1/consultas.class.php",
+      "type": "launch"
+    }
+  ]
+}
