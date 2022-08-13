@@ -4,7 +4,7 @@ require_once "config_db.php";
 class DbModelo{
   public $_db;
   public function __construct(){
-      $this->_db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+      $this->_db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
       if ( $this->_db->connect_errno ){
           echo "Fallo al conectar a MySQL: ". $this->_db->connect_error;
           return;
@@ -500,4 +500,3 @@ class DbModelo{
   }
 
 }
-?>
