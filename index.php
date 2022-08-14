@@ -6,7 +6,7 @@ require_once 'JWT.php';
 require_once 'BeforeValidException.php';
 require_once 'ExpiredException.php';
 require_once 'SignatureInvalidException.php';
-
+require_once 'v1/index.php';
 session_start();
 \Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
@@ -897,4 +897,3 @@ $app->get('/login/get_user/:token', function ($token) use ($app) {
  });
 
 $app->run();
-?>
