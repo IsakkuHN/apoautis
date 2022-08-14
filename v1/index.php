@@ -1,9 +1,12 @@
 <?php
+
 use Slim\Http\Request;
 use Slim\Http\Response;
+
+header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Headers: *");
 header('Content-Type: application/json');
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
+header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Authorization");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 header("Allow: GET, POST, OPTIONS, PUT, DELETE");
 require '../Slim/Slim.php';
@@ -32,23 +35,23 @@ $app->get('/login/:json', function ($json) use ($app) {
 
 $app->get('/backup', function () use ($app) {
     require_once('./conn.php');
-    $headers ="";
+    $headers = "";
     $headers .= "Pragma: no-cache" . "\r\n";
     $headers .= "Expires: 0" . "\r\n";
-    $headers .='Content-Transfer-Encoding: binary' . "\r\n";
+    $headers .= 'Content-Transfer-Encoding: binary' . "\r\n";
     $date = date("Y-m-d");
     $lugar = $_SERVER['SCRIPT_FILENAME'];
     $fecha = date('Ymd_hi');
-    $bd="apoautis";
-    $filename = $bd."_".$fecha."_backup.sql";
-    $usuario="root"; 
-    $passwd=""; 
+    $bd = "apoautis";
+    $filename = $bd . "_" . $fecha . "_backup.sql";
+    $usuario = "root";
+    $passwd = "";
     $executa = "C:/xampp/mysql/bin/mysqldump.exe --skip-lock-tables --user=$usuario --password=$passwd -R --opt $bd > C:/xampp/htdocs/ApoautisApis/backup/$filename";
     system($executa, $resultado);
 
-    if ($resultado) { 
-        echo json_encode("error"); 
-    }else{
+    if ($resultado) {
+        echo json_encode("error");
+    } else {
         echo json_encode("Listo");
     }
 });
@@ -56,20 +59,20 @@ $app->get('/backup', function () use ($app) {
 
 $app->get('/restor/:filename', function ($filename) use ($app) {
     require_once('./conn.php');
-    $headers ="";
+    $headers = "";
     $headers .= "Pragma: no-cache" . "\r\n";
     $headers .= "Expires: 0" . "\r\n";
-    $headers .='Content-Transfer-Encoding: binary' . "\r\n";
-    $bd="apoautis";
-    $path = 'C:/xampp/htdocs/ApoautisApis/backup/'.$filename;
-    $usuario="root"; 
-    $passwd=""; 
+    $headers .= 'Content-Transfer-Encoding: binary' . "\r\n";
+    $bd = "apoautis";
+    $path = 'C:/xampp/htdocs/ApoautisApis/backup/' . $filename;
+    $usuario = "root";
+    $passwd = "";
     $executa = "C:/xampp/mysql/bin/mysql.exe --user=$usuario --password=$passwd $bd < $path";
     system($executa, $resultado);
 
-    if ($resultado) { 
-        echo json_encode("error"); 
-    }else{
+    if ($resultado) {
+        echo json_encode("error");
+    } else {
         echo json_encode("Listo");
     }
 });
@@ -89,7 +92,6 @@ $app->get('/existeUsuario/:user', function ($user) use ($app) {
         $data_info = $instancia_db->getExisteUsuario($user);
         $response->setExisteUsuario($data_info);
         print_r(json_encode($response));
-        
     } catch (Exception $e) {
         echo 'Caught exception: ',  $e->getMessage(), "\n";
         $app->response->setStatus(500);
@@ -108,10 +110,10 @@ $app->get('/correo/:user', function ($user) use ($app) {
         $correo = $instancia_db->getEmailUser($user);
         $to = $correo;
         $subject = "¡Recuperación acceso!";
-        $headers ="";
+        $headers = "";
         $headers .= "MIME-Version: 1.0" . "\r\n";
         $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .='From:eocr2397@hotmail.com' . "\r\n";
+        $headers .= 'From:eocr2397@hotmail.com' . "\r\n";
         $message = $data_info;
         if (mail($to, $subject, $message, $headers)) {
             echo '{"correcto":true}';
@@ -195,10 +197,10 @@ $app->get('/establecerPass/:json', function ($json) use ($app) {
         $response->setCode(1);
         $response->setDescripcion("Success");
         $app->response->headers->set('Content-Type', 'application/json');
-        if(count($dataJson)==2 ){
-            $data = $instancia_db->insertPass($dataJson[0], $dataJson[1],0);
-        }else{
-            $data = $instancia_db->insertPass($dataJson[0], $dataJson[1],$dataJson[2]);
+        if (count($dataJson) == 2) {
+            $data = $instancia_db->insertPass($dataJson[0], $dataJson[1], 0);
+        } else {
+            $data = $instancia_db->insertPass($dataJson[0], $dataJson[1], $dataJson[2]);
         }
         $response->setPassEstablecido($data);
         print_r(json_encode($response));
@@ -1998,11 +2000,11 @@ $app->get('/bitacora', function () {
     require_once('./conn.php');
     include_once 'consultas.class.php';
     $instancia_db = new DbModelo();
-        $query = "select * from tbl_bitacora tb inner join tbl_usuarios tu on tb.Cod_usuario = tu.id_usuario inner join tbl_objetos to2 on tb.Cod_objeto = to2.Cod_objeto";
-        $result = mysqli_query($con, $query);
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[] = $row;
-        }
+    $query = "select * from tbl_bitacora tb inner join tbl_usuarios tu on tb.Cod_usuario = tu.id_usuario inner join tbl_objetos to2 on tb.Cod_objeto = to2.Cod_objeto";
+    $result = mysqli_query($con, $query);
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
     echo json_encode($data);
 });
 
@@ -2087,17 +2089,17 @@ $app->post('/usuario', function () use ($app) {
         $id_usuario = $data->id_usuario;
         $Cod_rol = $data->Cod_rol;
         $Cod_sede = $data->Cod_sede;
-        $nombre_usuario= $data->nombre_usuario;
+        $nombre_usuario = $data->nombre_usuario;
         $pass = $data->pass;
         $estado_usuario = $data->estado_usuario;
         $correo_electronico = $data->correo_electronico;
         $data_info = $instancia->getExisteUsuario(strtoupper($nombre_usuario));
-        if($data_info==true){
+        if ($data_info == true) {
             $respuesta = [
                 'error' => true,
                 'mensaje' => 'Ya existe un usuario con este nombre'
             ];
-        }else{
+        } else {
             $query = "INSERT INTO tbl_usuarios
             (Cod_rol, Cod_sede, nombre_usuario, pass, estado_usuario,correo_electronico, estado_pass)
             VALUES($Cod_rol, $Cod_sede ,upper('$nombre_usuario'),AES_ENCRYPT('$pass','_sis_'),'$estado_usuario','$correo_electronico',1)";
@@ -2114,18 +2116,18 @@ $app->post('/usuario', function () use ($app) {
         $id_usuario = $data->id_usuario;
         $Cod_rol = $data->Cod_rol;
         $Cod_sede = $data->Cod_sede;
-        $nombre_usuario= $data->nombre_usuario;
-        $nomUser=(strtoupper($nombre_usuario));
+        $nombre_usuario = $data->nombre_usuario;
+        $nomUser = (strtoupper($nombre_usuario));
         $pass = $data->pass;
         $estado_usuario = $data->estado_usuario;
         $correo_electronico = $data->correo_electronico;
-        $data_info = $instancia->getExisteUsuarioActualizar($id_usuario,$nomUser);
-        if(count($data_info)>=1 && $data_info['nombre_usuario']<>$nomUser){
+        $data_info = $instancia->getExisteUsuarioActualizar($id_usuario, $nomUser);
+        if (count($data_info) >= 1 && $data_info['nombre_usuario'] <> $nomUser) {
             $respuesta = [
                 'error' => true,
                 'mensaje' => 'Ya existe un usuario con este nombre'
             ];
-        }else{
+        } else {
             $query = "UPDATE tbl_usuarios
             SET Cod_rol=$Cod_rol,Cod_sede=$Cod_sede, nombre_usuario=upper('$nombre_usuario'), pass=AES_ENCRYPT('$pass','_sis_'), estado_usuario='$estado_usuario', estado_login='PV',correo_electronico='$correo_electronico' WHERE id_usuario=$id_usuario";
             $result = mysqli_query($con, $query);
@@ -2574,7 +2576,7 @@ $app->get('/permiso_mostrar/:user', function ($user) {
     require_once('./conn.php');
     $query = '';
     //$query = "select * from tbl_permisos t where t.Cod_rol = 3";
-        $query="SELECT o.Nombre_objeto,p.Permiso_insertar,p.Permiso_eliminar,p.Permiso_actualizar, p.Permiso_consultar, r.Rol, e.Estatus
+    $query = "SELECT o.Nombre_objeto,p.Permiso_insertar,p.Permiso_eliminar,p.Permiso_actualizar, p.Permiso_consultar, r.Rol, e.Estatus
         FROM tbl_usuarios u 
         INNER JOIN tbl_rol r on u.Cod_rol=r.Cod_rol
         INNER JOIN tbl_permisos p on r.Cod_rol=p.Cod_rol
@@ -2592,7 +2594,7 @@ $app->get('/permiso_mostrar/:user', function ($user) {
 $app->get('/permisos_data/:id', function ($id) use ($app) {
     $app->response->headers->set('Content-Type', 'application/json;charset=utf-8');
     require_once('./conn.php');
-   
+
     $query = "SELECT * from tbl_objetos t inner join tbl_permisos tp on t.Cod_objeto = tp.Cod_objeto where tp.Cod_rol = 1 and t.Cod_objeto = '$id'";
     $result = mysqli_query($con, $query);
     while ($row = mysqli_fetch_assoc($result)) {
